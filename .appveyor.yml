@@ -25,3 +25,4 @@ artifacts:
     name: Installer
 cache:
   - c:/tools/vcpkg/installed
+  - "%HOME%/clcache"
