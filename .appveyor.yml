@@ -19,7 +19,7 @@ build_script:
   - ps: $env:CLCACHE_DIR="%APPVEYOR_BUILD_FOLDER%/clcache"
   - set CC="%APPVEYOR_BUILD_FOLDER%/clcache.4.1.0/clcache-4.1.0/clcache.exe"
   - set CXX="%CC%"
-  - cmake -DCMAKE_C_COMPILER="/path/to/the/void.exe" -DCMAKE_CXX_COMPILER="/path/to/the/void.exe" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH=c:/Qt/5.12/msvc2017%QT_SUFFIX%;c:/tools/vcpkg/installed/%PLATFORM%-windows -DCMAKE_GENERATOR_PLATFORM="%CMAKE_PLATFORM%" ..
+  - cmake -DMAKE_C_COMPILER="/path/to/the/void.exe" -DCMAKE_CXX_COMPILER="/path/to/the/void.exe" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH=c:/Qt/5.12/msvc2017%QT_SUFFIX%;c:/tools/vcpkg/installed/%PLATFORM%-windows ..
   - cmake --build . -- /maxcpucount
   - cmake --build . --target tests
   - cmake --build . --target package
