@@ -18,7 +18,6 @@ build_script:
   - ps: $env:CLCACHE_DIR="%APPVEYOR_BUILD_FOLDER%/clcache"
   - set CC="%APPVEYOR_BUILD_FOLDER%/clcache.4.1.0/clcache-4.1.0/clcache.exe"
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars%PLATFORM_BITNESS%.bat"
-  - ps: "../clcache.4.1.0/clcache-4.1.0/clcache.exe"
   - cmake -DCMAKE_C_COMPILER="C:/projects.lmms-db2x2/clcache.4.1.0/clcache-4.1.0/clcache.exe" -DCMAKE_CXX_COMPILER="C:/projects.lmms-db2x2/clcache.4.1.0/clcache-4.1.0/clcache.exe" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH=c:/Qt/5.12/msvc2017%QT_SUFFIX%;c:/tools/vcpkg/installed/%PLATFORM%-windows ..
   - cmake --build . -- /maxcpucount
   - cmake --build . --target tests
