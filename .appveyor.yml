@@ -27,4 +27,4 @@ artifacts:
     name: stupid_file_not_want_to_work
 cache:
   - c:/tools/vcpkg/installed
-  - %HOME%/clcache
+  - "%USERPROFILE%/clcache"

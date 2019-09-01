@@ -87,7 +87,7 @@ if(BUILD_WITH_EXTERNALPROJECT)
 	include(InstallTargetDependencies)
 	INSTALL_TARGET_DEPENENCIES(TARGETS ${EXE_NAME}
 			DESTINATION "${PLUGIN_DIR}/32"
-			LIB_DIRS ${LIB_DIR} "${CMAKE_FIND_ROOT_PATH}"
+			LIB_DIRS ${LIB_DIR} "${CMAKE_PREFIX_PATH}"
 			LIB_DIRS_SUFFIXES bin lib ../bin)
 else()
 	# Needed to deploy dependencies of RemoteVstPlugin
