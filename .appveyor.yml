@@ -2,7 +2,7 @@ clone_depth: 1
 version: "{build}"
 image: Visual Studio 2017
 platform:
-  - x86
+#  - x86
   - x64
 environment:
   matrix:
@@ -27,4 +27,4 @@ artifacts:
     name: stupid_file_not_want_to_work
 cache:
   - c:/tools/vcpkg/installed
-  - "%HOME%/clcache"
+  - %HOME%/clcache

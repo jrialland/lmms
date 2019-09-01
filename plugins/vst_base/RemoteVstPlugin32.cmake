@@ -46,6 +46,8 @@ ELSEIF(LMMS_BUILD_WIN64 AND MSVC)
 		MESSAGE(WARNING "No Qt 32 bit installation found at ${QT_32_PREFIX}. If you're using VCPKG you can ignore this message if you've built x86-windows version of qt5")
 	ENDIF()
 
+	message("DEBUG: QT_32_PREFIX: ${QT_32_PREFIX}")
+
 	ExternalProject_Add(RemoteVstPlugin32
 		"${EXTERNALPROJECT_ARGS}"
 		CMAKE_GENERATOR "${CMAKE_GENERATOR_32}"
