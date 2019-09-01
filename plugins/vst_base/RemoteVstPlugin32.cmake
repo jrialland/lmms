@@ -12,7 +12,7 @@ MACRO(INSTALL_EXTERNAL_PROJECT name)
 	ExternalProject_Get_Property(${name} BINARY_DIR)
 
 	install(CODE
-			"execute_process(COMMAND ${CMAKE_COMMAND} \"-DCMAKE_INSTALL_PREFIX=\${CMAKE_INSTALL_PREFIX}\" -P cmake_install.cmake
+			"execute_process(COMMAND "${CMAKE_COMMAND}" \"-DCMAKE_INSTALL_PREFIX=\${CMAKE_INSTALL_PREFIX}\" -P cmake_install.cmake
         WORKING_DIRECTORY \"${BINARY_DIR}\")"
 	)
 ENDMACRO()
