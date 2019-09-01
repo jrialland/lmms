@@ -10,6 +10,7 @@ environment:
 install:
   - vcpkg install --triplet %PLATFORM%-windows --recurse fftw3 libsamplerate libsndfile sdl2
   - nuget install clcache -Version 4.1.0
+  - nuget install python
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir build
