@@ -23,6 +23,8 @@ build_script:
 artifacts:
   - path: 'build\lmms-*.exe'
     name: Installer
+  - path: 'build/plugins/vst_base/cmake_install.cmake'
+    name: stupid_file_not_want_to_work
 cache:
   - c:/tools/vcpkg/installed
   - "%HOME%/clcache"
