@@ -26,7 +26,7 @@
 #define FIFO_BUFFER_H
 
 #include <QtCore/QSemaphore>
-
+#include <memory>
 
 template<typename T>
 class fifoBuffer
@@ -37,15 +37,14 @@ public:
 		m_writer_sem( _size ),
 		m_reader_index( 0 ),
 		m_writer_index( 0 ),
-		m_size( _size )
+		m_size( _size ),
+		m_buffer(new T[_size])
 	{
-		m_buffer = new T[_size];
 		m_reader_sem.acquire( _size );
 	}
 
 	~fifoBuffer()
 	{
-		delete[] m_buffer;
 		m_reader_sem.release( m_size );
 	}
 
@@ -84,7 +83,7 @@ private:
 	int m_reader_index;
 	int m_writer_index;
 	int m_size;
-	T * m_buffer;
+	std::unique_ptr<T[]> m_buffer;
 
 } ;
 
