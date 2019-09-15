@@ -412,32 +412,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	// STAGE 1: run and render all play handles
 	MixerWorkerThread::fillJobQueue<PlayHandleList>( m_playHandles );
 	MixerWorkerThread::startAndWaitForJobs();
-
-	// removed all play handles which are done
-	for( PlayHandleList::Iterator it = m_playHandles.begin();
-						it != m_playHandles.end(); )
-	{
-		if( ( *it )->affinityMatters() &&
-			( *it )->affinity() != QThread::currentThread() )
-		{
-			++it;
-			continue;
-		}
-		if( ( *it )->isFinished() )
-		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
-			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
-			}
-			else delete *it;
-			it = m_playHandles.erase( it );
-		}
-		else
-		{
-			++it;
-		}
-	}
+	removeFinishedPlayHandles();
 
 	// STAGE 2: process effects of all instrument- and sampletracks
 	MixerWorkerThread::fillJobQueue<QVector<AudioPort *> >( m_audioPorts );
@@ -462,6 +437,33 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	m_profiler.finishPeriod( processingSampleRate(), m_framesPerPeriod );
 
 	return m_readBuf;
+}
+
+void Mixer::removeFinishedPlayHandles() {// removed all play handles which are done
+	for( PlayHandleList::Iterator it = m_playHandles.begin();
+		 it != m_playHandles.end(); )
+	{
+		if( ( *it )->affinityMatters() &&
+			( *it )->affinity() != QThread::currentThread() )
+		{
+			++it;
+			continue;
+		}
+		if( ( *it )->isFinished() )
+		{
+			( *it )->audioPort()->removePlayHandle( ( *it ) );
+			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
+			{
+				NotePlayHandleManager::release( (NotePlayHandle*) *it );
+			}
+			else delete *it;
+			it = m_playHandles.erase(it );
+		}
+		else
+		{
+			++it;
+		}
+	}
 }
 
 void Mixer::handleMetronome(Song *song) {

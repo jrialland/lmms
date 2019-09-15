@@ -373,6 +373,8 @@ private:
 	//! such that they can do changes in the model (like e.g. removing effects)
 	void runChangesInModel();
 
+	void removeFinishedPlayHandles();
+
 	bool m_renderOnly;
 
 	QVector<AudioPort *> m_audioPorts;
