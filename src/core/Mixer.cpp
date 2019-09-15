@@ -345,34 +345,8 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 	s_renderingThread = true;
 
-	static Song::PlayPos last_metro_pos = -1;
-
 	Song *song = Engine::getSong();
-
-	Song::PlayModes currentPlayMode = song->playMode();
-	Song::PlayPos p = song->getPlayPos( currentPlayMode );
-
-	bool playModeSupportsMetronome = currentPlayMode == Song::Mode_PlayPattern ||
-					 currentPlayMode == Song::Mode_PlaySong ||
-					 currentPlayMode == Song::Mode_PlayBB;
-
-	if( playModeSupportsMetronome && m_metronomeActive && !song->isExporting() &&
-		p != last_metro_pos &&
-			// Stop crash with metronome if empty project
-				Engine::getSong()->countTracks() )
-	{
-		tick_t ticksPerTact = MidiTime::ticksPerTact();
-		if ( p.getTicks() % (ticksPerTact / 1 ) == 0 )
-		{
-			addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );
-		}
-		else if ( p.getTicks() % (ticksPerTact /
-			song->getTimeSigModel().getNumerator() ) == 0 )
-		{
-			addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
-		}
-		last_metro_pos = p;
-	}
+	handleMetronome(song);
 
 	// swap buffer
 	m_inputBufferWrite = ( m_inputBufferWrite + 1 ) % 2;
@@ -490,7 +464,34 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	return m_readBuf;
 }
 
+void Mixer::handleMetronome(Song *song) {
+	static Song::PlayPos last_metro_pos = -1;
 
+	Song::PlayModes currentPlayMode = song->playMode();
+	Song::PlayPos p = song->getPlayPos( currentPlayMode );
+
+	bool playModeSupportsMetronome = currentPlayMode == Song::Mode_PlayPattern ||
+					 currentPlayMode == Song::Mode_PlaySong ||
+					 currentPlayMode == Song::Mode_PlayBB;
+
+	if(playModeSupportsMetronome && m_metronomeActive && !song->isExporting() &&
+		p != last_metro_pos &&
+			// Stop crash with metronome if empty project
+				Engine::getSong()->countTracks() )
+	{
+		tick_t ticksPerTact = MidiTime::ticksPerTact();
+		if ( p.getTicks() % (ticksPerTact / 1 ) == 0 )
+		{
+			addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg" ) );
+		}
+		else if ( p.getTicks() % (ticksPerTact /
+			song->getTimeSigModel().getNumerator() ) == 0 )
+		{
+			addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg" ) );
+		}
+		last_metro_pos = p;
+	}
+}
 
 
 void Mixer::clear()

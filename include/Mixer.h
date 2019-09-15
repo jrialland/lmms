@@ -42,6 +42,7 @@
 class AudioDevice;
 class MidiClient;
 class AudioPort;
+class Song;
 
 
 const fpp_t MINIMUM_BUFFER_SIZE = 32;
@@ -322,6 +323,7 @@ public:
 	static bool isAudioDevNameValid(QString name);
 	static bool isMidiDevNameValid(QString name);
 
+	void handleMetronome(Song *song);
 
 signals:
 	void qualitySettingsChanged();
@@ -441,7 +443,6 @@ private:
 	friend class LmmsCore;
 	friend class MixerWorkerThread;
 	friend class ProjectRenderer;
-
 } ;
 
 
