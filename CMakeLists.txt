@@ -493,7 +493,9 @@ FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
 	OPTION(USE_WERROR "Add -werror to the build flags. Stops the build on warnings" OFF)
-	IF(${USE_WERROR})
+
+	# Don't use -Werror with clang since it breaks a lot of stuff.
+	IF(${USE_WERROR} AND NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 		SET(WERROR_FLAGS "${WERROR_FLAGS} -Werror")
 	ENDIF()
 
