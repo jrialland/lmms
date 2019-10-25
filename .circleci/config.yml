@@ -1,4 +1,100 @@
-version: 2
+version: 2.1
+
+orbs:
+  win: circleci/windows@1.0.0
+
+commands:
+  common-run_with_cache_for_branch:
+    description: "restore your cache, runs your code, and save your cache. key is generated automatically according to your branch"
+    parameters:
+      key:
+        type: string
+      steps:
+        type: steps
+      path:
+        type: string
+    steps:
+      - restore_cache:
+          keys:
+            - << parameters.key >>-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}
+            - << parameters.key >>-{{ arch }}-{{ .Environment.CIRCLE_JOB }}
+            - << parameters.key >>-{{ arch }}
+      - steps: << parameters.steps >>
+      - save_cache:
+          key: << parameters.key >>-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .BuildNum }}
+          paths:
+            - << parameters.path >>
+
+  vcpkg-install_vcpkg:
+    steps:
+      - run:
+          name: "Installing/updating vcpkg"
+          shell: bash
+          command: "(git clone https://github.com/Microsoft/vcpkg.git && vcpkg/bootstrap-vcpkg.bat) || (cd vcpkg && git pull)"
+  vcpkg-install_with_cache:
+    description: "install vcpkg packages, and caches the packages"
+    parameters:
+      packages:
+        type: string
+      triplet:
+        type: string
+      recurse:
+        type: boolean
+        default: true
+    steps:
+      - common-run_with_cache_for_branch:
+          path: vcpkg
+          key: vcpkg
+          steps:
+            - vcpkg-install_vcpkg
+            - run: vcpkg/vcpkg.bat install <<# parameters.recurse >> --recurse <</ parameters.recurse >> --triplet << parameters.triplet >> << parameters.packages >>
+  msvc-run_with_clcache:
+    description: "Installs clcache, runs your code, and saves the cache"
+    parameters:
+      steps:
+        type: steps
+      clcache_version:
+        type: string
+        default: "4.1.0"
+    steps:
+      - run: nuget install clcache -Version << parameters.clcache_version >>
+      - common-run_with_cache_for_branch:
+          key: clcache-<< parameters.clcache_version >>
+          path: "{{ .Environment.HOME }}/clcache"
+          steps:
+            - steps: << parameters.steps >>
+  lmms-generic_msvc_build:
+    parameters:
+      platform:
+        type: enum
+        enum: ["x86", "x64"]
+
+    steps:
+      - vcpkg-install_with_cache:
+          packages: "fftw3 libsamplerate libsndfile sdl2 qt5"
+          triplet: << parameters.platform >>-windows
+      - msvc-run_with_clcache:
+          steps:
+            - run:
+                name: "Configuring and building"
+                command: |
+                  mkdir build && cd build
+                  cmake -DUSE_COMPILE_CACHE=ON -DCACHE_TOOL="$(echo clcache.*/clcache-*/clcache.exe)" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH=c:/Qt/5.12/msvc2017%QT_SUFFIX%;c:/
+                  cmake --build . -- /maxcpucount:6
+                shell: bash
+            - run:
+                name: "Building tests"
+                command: |
+                  cd build
+                  cmake --build . --target tests
+      - run:
+          name: "Building installer"
+          command: |
+            cd build
+            cmake --build . --target package
+      - store_artifacts:
+          path: 'build\lmms-*.exe'
+          destination: /
 
 shared:
   restore_cache: &restore_cache
@@ -111,7 +207,7 @@ jobs:
           destination: /
       - *ccache_stats
       - *save_cache
-  linux.gcc:
+  linux-gcc:
     docker:
       - image: lmmsci/linux.gcc:xenial
     environment:
@@ -195,7 +291,18 @@ jobs:
           destination: /
       - *save_cache
       - *save_homebrew_cache
-
+  MSVC32:
+    executor: win/vs2019
+    steps:
+      - checkout
+      - lmms-generic_msvc_build:
+          platform: "x86"
+  MSVC64:
+    executor: win/vs2019
+    steps:
+      - checkout
+      - lmms-generic_msvc_build:
+          platform: "x64"
 
 workflows:
   version: 2
@@ -204,5 +311,7 @@ workflows:
       - macos
       - mingw32
       - mingw64
-      - linux.gcc
+      - linux-gcc
       - shellcheck
+      - MSVC32
+      - MSVC64
