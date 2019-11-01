@@ -7,8 +7,13 @@ jobs:
     env:
       QT_VERSION: 5.9.8
       CLCACHE_DIR: C:\clcache
+      BITNESS: ${{ matrix.os_version }}
     runs-on: windows-latest
     steps:
+      - run: $env:PLATFORM=x86
+        if: matrix.os_version == 32
+      - run: $env:PLATFORM=x64
+        if: matrix.os_version == 64
       - uses: actions/checkout@v1
       - name: Cache vcpkg packages
         uses: actions/cache@preview
@@ -27,19 +32,20 @@ jobs:
       - name: Install Qt
         run: |
           pip install aqtinstall
-          python -m aqt install --outputdir C:\Qt $env:QT_VERSION windows desktop win32_msvc2015
+          python -m aqt install --outputdir C:\Qt $env:QT_VERSION windows desktop win$env:BITNESS_msvc2015
           dir C:\Qt\Qt$env:QT_VERSION\$env:QT_VERSION
       - name: Install dependencies
         run: |
-          vcpkg install --triplet x86-windows --recurse fftw3 libsamplerate libsndfile sdl2
+          vcpkg install --triplet $env:PLATFORM-windows --recurse fftw3 libsamplerate libsndfile sdl2
           pip install clcache
       - name: Configure
         run: |
-          cmake -G "Visual Studio 16 2019" -A Win32                     `
+          cmake -G "Visual Studio 16 2019" -A Win$env:BITNESS`
             -S "$env:GITHUB_WORKSPACE" -B "$env:GITHUB_WORKSPACE/build" `
             -DUSE_COMPILE_CACHE=ON                                      `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo                           `
-            -DCMAKE_PREFIX_PATH="c:/Qt/Qt$env:QT_VERSION/$env:QT_VERSION/msvc2015;$env:VCPKG_INSTALLATION_ROOT\installed\x86-windows"
+            -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake
+            -DCMAKE_PREFIX_PATH="c:/Qt/Qt$env:QT_VERSION/$env:QT_VERSION/msvc2015"
       - name: Build
         run: |
           cmake --build "$env:GITHUB_WORKSPACE/build" -- /maxcpucount:4
