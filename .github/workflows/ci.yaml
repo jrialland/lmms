@@ -1,0 +1,45 @@
+name: CI
+on:
+  - push
+  - pull_request
+jobs:
+  win32:
+    env:
+      QT_VERSION: 5.9.8
+      CLCACHE_DIR: C:\clcache
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Cache vcpkg packages
+        uses: actions/cache@preview
+        with:
+          path: "C:/vcpkg/installed"
+          key: vcpkg
+          restore-keys: |
+            vcpkg
+      - name: clcache
+        uses: actions/cache@preview
+        with:
+          path: "C:/clcache"
+          key: clcache-win32-${{ github.ref }}
+          restore-keys: |
+            clache-win32-
+      - name: Install Qt
+        run: |
+          pip install aqtinstall
+          python -m aqt install --outputdir C:\Qt $env:QT_VERSION windows desktop win32_msvc2015
+          dir C:\Qt\Qt$env:QT_VERSION\$env:QT_VERSION
+      - name: Install dependencies
+        run: |
+          vcpkg install --triplet x86-windows --recurse fftw3 libsamplerate libsndfile sdl2
+          pip install clcache
+      - name: Configure
+        run: |
+          cmake -G "Visual Studio 16 2019" -A Win32                     `
+            -S "$env:GITHUB_WORKSPACE" -B "$env:GITHUB_WORKSPACE/build" `
+            -DUSE_COMPILE_CACHE=ON                                      `
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo                           `
+            -DCMAKE_PREFIX_PATH="c:/Qt/Qt$env:QT_VERSION/$env:QT_VERSION/msvc2015;$env:VCPKG_INSTALLATION_ROOT\installed\x86-windows"
+      - name: Build
+        run: |
+          cmake --build "$env:GITHUB_WORKSPACE/build" -- /maxcpucount:4
