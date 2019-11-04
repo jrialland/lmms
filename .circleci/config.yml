@@ -47,7 +47,7 @@ commands:
           key: vcpkg
           steps:
             - vcpkg-install_vcpkg
-            - run: vcpkg/vcpkg.bat install <<# parameters.recurse >> --recurse <</ parameters.recurse >> --triplet << parameters.triplet >> << parameters.packages >>
+            - run: vcpkg/vcpkg install <<# parameters.recurse >> --recurse <</ parameters.recurse >> --triplet << parameters.triplet >> << parameters.packages >>
   msvc-run_with_clcache:
     description: "Installs clcache, runs your code, and saves the cache"
     parameters:
@@ -71,7 +71,7 @@ commands:
 
     steps:
       - vcpkg-install_with_cache:
-          packages: "fftw3 libsamplerate libsndfile sdl2 qt5"
+          packages: "fftw3 libsamplerate libsndfile sdl2"
           triplet: << parameters.platform >>-windows
       - msvc-run_with_clcache:
           steps:
