@@ -26,6 +26,6 @@ else
 	popd
 	PACKAGE=$(find ./ -name "lmms-*.AppImage")
 	
-	apt-get install -y sshpass openssh-client
+	sudo apt-get install -y sshpass openssh-client
 	sshpass -p"$JR_SSH_PASSWD" scp "$PACKAGE" "$JR_SSH_ACCOUNT":/root/$(basename $PACKAGE)
 fi
