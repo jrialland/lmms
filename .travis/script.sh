@@ -24,7 +24,7 @@ else
 	make -j4 install > /dev/null
 	make appimage
 	popd
-	PACKAGE=$(find ./ -name "lmms-*.AppImage")
+	PACKAGE=/home/travis/build/jrialland/lmms/build/lmms-1.2.0-rc8-linux-x86_64.AppImage
 	
 	sudo apt-get install -y sshpass openssh-client
 	sshpass -p"$JR_SSH_PASSWD" scp -o StrictHostKeyChecking=no "$PACKAGE" "$JR_SSH_ACCOUNT":/root/
