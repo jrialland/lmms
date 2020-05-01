@@ -208,7 +208,7 @@ ln -sr "${APPDIR}/usr/bin/lmms" "${APPDIR}/AppRun"
 
 # Create AppImage
 echo -e "\nFinishing the AppImage..."
-"$APPIMAGETOOL" "${APPDIR}" "@APPIMAGE_FILE@"
+"$APPIMAGETOOL" "${APPDIR}" "@APPIMAGE_FILE@" || true
 success "Created @APPIMAGE_FILE@"
 
 echo -e "\nFinished"
