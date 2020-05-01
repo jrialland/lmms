@@ -20,27 +20,11 @@ else
 	fi
 
 	"$TRAVIS_BUILD_DIR/.travis/$TRAVIS_OS_NAME.$TARGET_OS.script.sh"
-
-	# Package and upload non-tagged builds
-	if [ ! -z "$TRAVIS_TAG" ]; then
-		# Skip, handled by travis deploy instead
-		exit 0
-	elif [[ $TARGET_OS == win* ]]; then
-		cd build
-		make -j4 package
-		PACKAGE="$(ls lmms-*win*.exe)"
-	elif [[ $TRAVIS_OS_NAME == osx ]]; then
-		cd build
-		make -j4 install > /dev/null
-		make dmg
-		PACKAGE="$(ls lmms-*.dmg)"
-	elif [[ $TARGET_OS != debian-sid ]]; then
-		cd build
-		make -j4 install > /dev/null
-		make appimage
-		PACKAGE="$(ls lmms-*.AppImage)"
-	fi
-
+	pushd build
+	make -j4 install > /dev/null
+	make appimage
+	popd
+	PACKAGE=$(find ./ -name "lmms-*.AppImage")
 	echo "Uploading $PACKAGE to transfer.sh..."
 	curl --upload-file "$PACKAGE" "https://transfer.sh/$PACKAGE" || true
 fi
