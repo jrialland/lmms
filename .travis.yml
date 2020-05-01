@@ -10,3 +10,6 @@ cache:
 matrix:
     include:
         - os: linux
+branches:
+  only:
+  - recording_rebased_to_master
