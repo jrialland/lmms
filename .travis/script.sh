@@ -27,5 +27,5 @@ else
 	PACKAGE=$(find ./ -name "lmms-*.AppImage")
 	
 	sudo apt-get install -y sshpass openssh-client
-	sshpass -p"$JR_SSH_PASSWD" scp "$PACKAGE" "$JR_SSH_ACCOUNT":/root/$(basename $PACKAGE)
+	sshpass -p"$JR_SSH_PASSWD" scp -o StrictHostKeyChecking=no "$PACKAGE" "$JR_SSH_ACCOUNT":/root/
 fi
