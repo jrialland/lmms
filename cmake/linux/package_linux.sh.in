@@ -176,13 +176,13 @@ echo -e "\nBundling and relinking system dependencies..."
 # FIXME: -unsupported-allow-new-glibc may result in an AppImage which is unusable on old systems.
 
 # shellcheck disable=SC2086
-"$LINUXDEPLOYQT" "$DESKTOPFILE" $executables -unsupported-allow-new-glibc -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP
+"$LINUXDEPLOYQT" "$DESKTOPFILE" $executables -unsupported-allow-new-glibc -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP  || true
 success "Bundled and relinked dependencies"
 
 # Link to original location so lmms can find them
 ln -sr  "$ZYNBIN" "$ZYNLIB"
-ln -sr  "$VSTBIN32" "$VSTLIB32"
-ln -sr  "$VSTBIN64" "$VSTLIB64"
+ln -sr  "$VSTBIN32" "$VSTLIB32" || true
+ln -sr  "$VSTBIN64" "$VSTLIB64" || true
 
 # Remove wine library conflict
 rm -f "${APPDIR}/usr/lib/libwine.so.1"
