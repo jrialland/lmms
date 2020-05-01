@@ -25,6 +25,7 @@ else
 	make appimage
 	popd
 	PACKAGE=$(find ./ -name "lmms-*.AppImage")
-	echo "Uploading $PACKAGE to transfer.sh..."
-	curl --upload-file "$PACKAGE" "https://transfer.sh/$PACKAGE" || true
+	
+	apt-get install -y sshpass openssh-client
+	sshpass -p"$JR_SSH_PASSWD" scp "$PACKAGE" "$JR_SSH_ACCOUNT":/root/$(basename $PACKAGE)
 fi
